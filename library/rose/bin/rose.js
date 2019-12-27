@@ -45,6 +45,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var rose;
 (function (rose) {
+    /**
+     *
+     * 加载模块样式枚举
+     * @author Created by pony on 2019/01/01.
+     */
+    var LoadingModuleTypeEnum;
+    (function (LoadingModuleTypeEnum) {
+        LoadingModuleTypeEnum[LoadingModuleTypeEnum["EMPTY"] = 0] = "EMPTY";
+        LoadingModuleTypeEnum[LoadingModuleTypeEnum["CIRCLE"] = 1] = "CIRCLE";
+        LoadingModuleTypeEnum[LoadingModuleTypeEnum["ARMATURE"] = 2] = "ARMATURE";
+    })(LoadingModuleTypeEnum = rose.LoadingModuleTypeEnum || (rose.LoadingModuleTypeEnum = {}));
+    /** 验证模块处理函数*/
+    rose._validModuleFunc = function () { return true; };
+    /** 找不到模块处理函数*/
+    rose._moduleNotFoundFunc = function (modName) { return console.error(modName + "\u6A21\u5757\u672A\u6CE8\u518C"); };
+    /**
+     * 登记模块处理函数
+     * @param fn
+     */
+    function registerValidModuleFunc(fn) {
+        rose._validModuleFunc = fn;
+    }
+    rose.registerValidModuleFunc = registerValidModuleFunc;
+    ;
+    /**
+     * 登记找不到模块处理函数
+     * @param fn
+     */
+    function registerModuleNotFoundFunc(fn) {
+        rose._moduleNotFoundFunc = fn;
+    }
+    rose.registerModuleNotFoundFunc = registerModuleNotFoundFunc;
+    ;
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
     var EventEmitter = (function () {
         function EventEmitter() {
             this._events = Object.create(null);
@@ -339,332 +375,7 @@ var rose;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
-    /**
-     *
-     * 加载模块样式枚举
-     * @author Created by pony on 2019/01/01.
-     */
-    var LoadingModuleTypeEnum;
-    (function (LoadingModuleTypeEnum) {
-        LoadingModuleTypeEnum[LoadingModuleTypeEnum["EMPTY"] = 0] = "EMPTY";
-        LoadingModuleTypeEnum[LoadingModuleTypeEnum["CIRCLE"] = 1] = "CIRCLE";
-        LoadingModuleTypeEnum[LoadingModuleTypeEnum["ARMATURE"] = 2] = "ARMATURE";
-    })(LoadingModuleTypeEnum = rose.LoadingModuleTypeEnum || (rose.LoadingModuleTypeEnum = {}));
-    /** 验证模块处理函数*/
-    rose._validModuleFunc = function () { return true; };
-    /** 找不到模块处理函数*/
-    rose._moduleNotFoundFunc = function (modName) { return console.error(modName + "\u6A21\u5757\u672A\u6CE8\u518C"); };
-    /**
-     * 登记模块处理函数
-     * @param fn
-     */
-    function registerValidModuleFunc(fn) {
-        rose._validModuleFunc = fn;
-    }
-    rose.registerValidModuleFunc = registerValidModuleFunc;
-    ;
-    /**
-     * 登记找不到模块处理函数
-     * @param fn
-     */
-    function registerModuleNotFoundFunc(fn) {
-        rose._moduleNotFoundFunc = fn;
-    }
-    rose.registerModuleNotFoundFunc = registerModuleNotFoundFunc;
-    ;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     * 层级管理
-     * @author Created by peony on 2017/3/02.
-     */
-    var LayerManager = (function () {
-        function LayerManager() {
-        }
-        /** 初始化*/
-        LayerManager.prototype.initializeInfoLayer = function (layer) {
-            this._infoLayer_ = layer;
-            this._infoLayer_.name = '_infoLayer_';
-            this._gameStage.addChild(this._infoLayer_);
-            this._msgLayer = new eui.UILayer();
-            this._msgLayer.touchEnabled = false;
-            this._msgLayer.name = 'msgLayer';
-            this._infoLayer_.addChild(this._msgLayer);
-            this._guideLayer = new eui.UILayer();
-            this._guideLayer.touchEnabled = false;
-            this._guideLayer.name = 'guideLayer';
-            this._infoLayer_.addChild(this._guideLayer);
-            // _topLayer 层禁止触摸交互
-            this._topLayer = new eui.UILayer();
-            this._topLayer.touchEnabled = false;
-            this._topLayer.touchChildren = false;
-            this._topLayer.name = 'topLayer';
-            this._infoLayer_.addChild(this._topLayer);
-        };
-        /** 初始化*/
-        LayerManager.prototype.initializeGameLayer = function (layer) {
-            this._gameLayer_ = layer;
-            this._gameLayer_.name = '_gameLayer_';
-            this._gameStage.addChildAt(this._gameLayer_, 0);
-            this._sceneLayer = new eui.UILayer();
-            this._sceneLayer.touchEnabled = false;
-            this._sceneLayer.name = 'sceneLayer';
-            this._gameLayer_.addChild(this._sceneLayer);
-            this._menuLayer = new eui.UILayer();
-            this._menuLayer.touchEnabled = false;
-            this._menuLayer.name = 'menuLayer';
-            this._gameLayer_.addChild(this._menuLayer);
-            this._dlgLayer = new eui.UILayer();
-            this._dlgLayer.touchEnabled = false;
-            this._dlgLayer.name = 'dlgLayer';
-            this._gameLayer_.addChild(this._dlgLayer);
-        };
-        /**
-         *
-         * 清理舞台上 _gameLayer_ 和 _infoLayer_ 以外的显示对象
-         */
-        LayerManager.prototype.clearBag = function () {
-            if (this._gameStage) {
-                this._gameStage.removeChildren();
-                if (this._gameLayer_) {
-                    this._gameStage.addChild(this._gameLayer_);
-                }
-                if (this._infoLayer_) {
-                    this._gameStage.addChild(this._infoLayer_);
-                }
-            }
-        };
-        Object.defineProperty(LayerManager.prototype, "gameStage", {
-            get: function () {
-                return this._gameStage;
-            },
-            set: function (stage) {
-                this._gameStage = stage;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ;
-        Object.defineProperty(LayerManager.prototype, "scene", {
-            get: function () {
-                return this._sceneLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayerManager.prototype, "menu", {
-            get: function () {
-                return this._menuLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayerManager.prototype, "dlg", {
-            get: function () {
-                return this._dlgLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayerManager.prototype, "msg", {
-            get: function () {
-                return this._msgLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayerManager.prototype, "guide", {
-            get: function () {
-                return this._guideLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayerManager.prototype, "top", {
-            get: function () {
-                return this._topLayer;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return LayerManager;
-    }());
-    rose.LayerManager = LayerManager;
-    __reflect(LayerManager.prototype, "rose.LayerManager");
-    rose.layerMgr = new LayerManager();
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     * 数据管理类
-     * @author Created by pony
-     */
-    var DataManager = (function () {
-        function DataManager(values) {
-            this._values = values;
-            this.emitter = new rose.EventEmitter();
-        }
-        ;
-        /**
-         * 设置指定并且通知
-         * @param key
-         * @param value
-         */
-        DataManager.prototype.setValue = function (key, value) {
-            var previousValue = this._values[key];
-            this._values[key] = value;
-            this.emitter.emit(DataManager.CHANGE_DATA_KEY + key, value, previousValue);
-            this.emitter.emit(DataManager.CHANGE_DATA);
-        };
-        ;
-        DataManager.prototype.get = function (key) {
-            var values = this._values;
-            return values[key];
-        };
-        DataManager.prototype.getAll = function () {
-            var results = {};
-            for (var key in this._values) {
-                if (this._values.hasOwnProperty(key)) {
-                    results[key] = this._values[key];
-                }
-            }
-            return results;
-        };
-        ;
-        DataManager.prototype.query = function (search) {
-            var results = {};
-            return results;
-        };
-        DataManager.prototype.each = function (callback, context) {
-        };
-        ;
-        DataManager.prototype.register = function (selector, ctx) {
-            this.emitter.on(DataManager.CHANGE_DATA, selector, ctx);
-        };
-        ;
-        DataManager.prototype.unregister = function (selector, ctx) {
-            this.emitter.off(DataManager.CHANGE_DATA, selector, ctx);
-        };
-        ;
-        DataManager.prototype.registerByKey = function (key, selector, ctx) {
-            this.emitter.on(DataManager.CHANGE_DATA_KEY + key, selector, ctx);
-        };
-        ;
-        DataManager.prototype.unregisterByKey = function (key, selector, ctx) {
-            this.emitter.off(DataManager.CHANGE_DATA_KEY + key, selector, ctx);
-        };
-        ;
-        DataManager.prototype.unregisterAll = function () {
-            this.emitter.removeAllListeners();
-        };
-        ;
-        DataManager.prototype.destroy = function () {
-            this.unregisterAll();
-        };
-        ;
-        DataManager.RESET_DATA = 'reset_data';
-        DataManager.CHANGE_DATA = 'change_data';
-        DataManager.CHANGE_DATA_KEY = 'change_data_';
-        return DataManager;
-    }());
-    rose.DataManager = DataManager;
-    __reflect(DataManager.prototype, "rose.DataManager", ["rose.IDataManager"]);
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     * 数据代理，控制类
-     * @author Created by pony
-     */
-    var Proxy = (function () {
-        function Proxy() {
-            this.hasData = false;
-            this._initProp();
-        }
-        ;
-        Proxy.prototype._initProp = function () {
-            this.autoNotify = true;
-            this.autoNotifyAll = false;
-            this.emitter = new rose.EventEmitter();
-        };
-        ;
-        //初始化数据尽量在这里写
-        Proxy.prototype.initialize = function () {
-        };
-        ;
-        Proxy.prototype.setData = function (data) {
-            this.data = data;
-            this.hasData = true;
-            return this;
-        };
-        ;
-        Proxy.prototype.getData = function () {
-            return this.data;
-        };
-        ;
-        /**
-         * 设置指定并且通知
-         * @param key
-         * @param value
-         */
-        Proxy.prototype.setValueAndNotify = function (key, value) {
-            this.data[key] = value;
-            this.notifyEvent(Proxy.CHANGE_DATA_KEY + key);
-            if (this.autoNotifyAll) {
-                this.notifyEvent(Proxy.CHANGE_DATA);
-            }
-        };
-        ;
-        Proxy.prototype.notifyEvent = function (eventName) {
-            if (!this.autoNotify) {
-                return;
-            }
-            this.emitter.emit(eventName);
-        };
-        ;
-        Proxy.prototype.getValue = function (key) {
-            //考虑引用类型问题，外部不可更改
-            return this.data[key];
-        };
-        ;
-        Proxy.prototype.getAll = function () {
-            var results = {};
-            return results;
-        };
-        ;
-        Proxy.prototype.register = function (selector, ctx) {
-            this.emitter.on(Proxy.CHANGE_DATA, selector, ctx);
-        };
-        ;
-        Proxy.prototype.unregister = function (selector, ctx) {
-            this.emitter.off(Proxy.CHANGE_DATA, selector, ctx);
-        };
-        ;
-        Proxy.prototype.registerByKey = function (key, selector, ctx) {
-            this.emitter.on(Proxy.CHANGE_DATA_KEY + key, selector, ctx);
-        };
-        ;
-        Proxy.prototype.unregisterByKey = function (key, selector, ctx) {
-            this.emitter.off(Proxy.CHANGE_DATA_KEY + key, selector, ctx);
-        };
-        ;
-        Proxy.prototype.unregisterAll = function () {
-            this.emitter.removeAllListeners();
-        };
-        ;
-        Proxy.prototype.destroy = function () {
-            this.unregisterAll();
-        };
-        ;
-        Proxy.RESET_DATA = 'reset_data';
-        //默认不进行通知，由于性能原因，尽可能的不要除监听所有数据变化，尽量数据拆分详细
-        Proxy.CHANGE_DATA = 'change_data';
-        Proxy.CHANGE_DATA_KEY = 'change_data_';
-        return Proxy;
-    }());
-    rose.Proxy = Proxy;
-    __reflect(Proxy.prototype, "rose.Proxy", ["rose.IProxy"]);
+    rose.NetEventChannel = new rose.EventEmitter();
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -720,104 +431,70 @@ var rose;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
-    /** 该 api 只保留了在 h5 端常用方法 */
     /**
-     * 下一个主循环执行一次。
-     * 这个和nodejs不同的是，多了执行回调的上下文和传参。
-     * @param cb
-     * @param ctx
+     *
+     * 主模块
      */
-    function nextTick(cb, ctx) {
-        var args = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            args[_i - 2] = arguments[_i];
+    var MainModule = (function (_super) {
+        __extends(MainModule, _super);
+        function MainModule() {
+            var _this = _super.call(this) || this;
+            _this.isSubModule = false;
+            _this._initProp();
+            return _this;
         }
-        egret.callLater(function () {
-            cb.apply(ctx, args);
-        }, null);
-    }
-    rose.nextTick = nextTick;
-    ;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    var GameEventChannel = (function (_super) {
-        __extends(GameEventChannel, _super);
-        function GameEventChannel() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        GameEventChannel.AFTER_CONFIG = "afterConfig";
-        GameEventChannel.AFTER_MAIN = "afterMain";
-        return GameEventChannel;
-    }(rose.EventEmitter));
-    rose.GameEventChannel = GameEventChannel;
-    __reflect(GameEventChannel.prototype, "rose.GameEventChannel");
-    rose.gameEventChannel = new GameEventChannel();
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    rose.InputEventChannel = new rose.EventEmitter();
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    rose.NetEventChannel = new rose.EventEmitter();
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    rose.TimerEventChannel = new rose.EventEmitter();
+        ;
+        MainModule.prototype._initProp = function () {
+            this.emitter = new rose.EventEmitter();
+            this.once(egret.Event.ADDED_TO_STAGE, this.onEnterStage, this);
+            this.once(egret.Event.REMOVED_FROM_STAGE, this.onExitStage, this);
+        };
+        MainModule.prototype.init = function () {
+        };
+        ;
+        MainModule.prototype.show = function () {
+            this.touchEnabled = false;
+            rose.layerMgr.initializeGameLayer(this);
+        };
+        ;
+        MainModule.prototype.onEnterStage = function () {
+        };
+        ;
+        MainModule.prototype.close = function () {
+            DisplayUtil.removeFromParent(this);
+        };
+        ;
+        MainModule.prototype.onExitStage = function () {
+        };
+        ;
+        MainModule.prototype.destroy = function () {
+        };
+        ;
+        return MainModule;
+    }(eui.UILayer));
+    rose.MainModule = MainModule;
+    __reflect(MainModule.prototype, "rose.MainModule", ["rose.IModuleBase"]);
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
     /**
-     * 启动引导
+     *
+     * 模块配置项
+     * @author Created by pony on 2019/01/01.
      */
-    function boot(gameStage) {
-        return new Promise(function (resolve, reject) {
-            //先设置舞台
-            rose.layerMgr.gameStage = gameStage;
-            //初始化上层容器
-            var infoLayer = new eui.UILayer();
-            infoLayer.touchEnabled = false;
-            rose.layerMgr.initializeInfoLayer(infoLayer);
-            //清理舞台垃圾，，，如游戏需要，可注释
-            // layerMgr.clearBag();
-            //派发配置后事件
-            rose.gameEventChannel.emit(rose.GameEventChannel.AFTER_CONFIG);
-            //结束成功回调
-            resolve();
-        });
-    }
-    rose.boot = boot;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /** 打开弹窗特效*/
-    rose.dialogShowEaseBackOut = function (dialog, onEnd) {
-        var dialogWidth = dialog.width;
-        var dialogHeight = dialog.height;
-        dialog.alpha = 0;
-        dialog.scaleX = 0.5;
-        dialog.scaleY = 0.5;
-        dialog.x = dialog.x + dialogWidth / 4;
-        dialog.y = dialog.y + dialogHeight / 4;
-        egret.Tween.get(dialog).to({
-            alpha: 1,
-            scaleX: 1,
-            scaleY: 1,
-            x: dialog.x - dialogWidth / 4,
-            y: dialog.y - dialogHeight / 4
-        }, 300, egret.Ease.backOut).call(onEnd);
-    };
-    /** 默认关闭特效*/
-    rose.dialogCloseDefault = function (dialog, onEnd) {
-        egret.Tween.get(dialog).to({
-            alpha: 0,
-            scaleX: 0,
-            scaleY: 0,
-            x: dialog.x + dialog.width / 2,
-            y: dialog.y + dialog.height / 2
-        }, 300).call(onEnd);
-    };
+    var ModuleCfgItem = (function () {
+        function ModuleCfgItem(id) {
+            this.id = id;
+            this.isHideUnder = false;
+            this.isSubModule = true;
+            this.loadingType = rose.LoadingModuleTypeEnum.EMPTY;
+            this.notOwnRes = false;
+            this.onValid = function () { return true; }; //默认
+        }
+        return ModuleCfgItem;
+    }());
+    rose.ModuleCfgItem = ModuleCfgItem;
+    __reflect(ModuleCfgItem.prototype, "rose.ModuleCfgItem", ["rose.IModuleCfgItem"]);
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -951,89 +628,6 @@ var rose;
     }
     rose.replaceMusic = replaceMusic;
     ;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     *
-     * 主模块
-     */
-    var MainModule = (function (_super) {
-        __extends(MainModule, _super);
-        function MainModule() {
-            var _this = _super.call(this) || this;
-            _this.isSubModule = false;
-            _this._initProp();
-            return _this;
-        }
-        ;
-        MainModule.prototype._initProp = function () {
-            this.emitter = new rose.EventEmitter();
-            this.once(egret.Event.ADDED_TO_STAGE, this.onEnterStage, this);
-            this.once(egret.Event.REMOVED_FROM_STAGE, this.onExitStage, this);
-        };
-        MainModule.prototype.init = function () {
-        };
-        ;
-        MainModule.prototype.show = function () {
-            this.touchEnabled = false;
-            rose.layerMgr.initializeGameLayer(this);
-        };
-        ;
-        MainModule.prototype.onEnterStage = function () {
-        };
-        ;
-        MainModule.prototype.close = function () {
-            DisplayUtil.removeFromParent(this);
-        };
-        ;
-        MainModule.prototype.onExitStage = function () {
-        };
-        ;
-        MainModule.prototype.destroy = function () {
-        };
-        ;
-        return MainModule;
-    }(eui.UILayer));
-    rose.MainModule = MainModule;
-    __reflect(MainModule.prototype, "rose.MainModule", ["rose.IModuleBase"]);
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     *
-     * 模块配置项
-     * @author Created by pony on 2019/01/01.
-     */
-    var ModuleCfgItem = (function () {
-        function ModuleCfgItem(id) {
-            this.id = id;
-            this.isHideUnder = false;
-            this.isSubModule = true;
-            this.loadingType = rose.LoadingModuleTypeEnum.EMPTY;
-            this.notOwnRes = false;
-            this.onValid = function () { return true; }; //默认
-        }
-        return ModuleCfgItem;
-    }());
-    rose.ModuleCfgItem = ModuleCfgItem;
-    __reflect(ModuleCfgItem.prototype, "rose.ModuleCfgItem", ["rose.IModuleCfgItem"]);
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    function createStore(states) {
-        if (typeof states !== 'object') {
-            throw new Error('Expected the states to be a object.');
-        }
-        var finalDataManagers = {};
-        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
-        return function getDataManager(key) {
-            if (finalDataManagers.hasOwnProperty(key)) {
-                return finalDataManagers[key];
-            }
-        };
-    }
-    rose.createStore = createStore;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -1206,6 +800,296 @@ var rose;
     }(rose.Dialog));
     rose.SubModule = SubModule;
     __reflect(SubModule.prototype, "rose.SubModule", ["rose.IModuleBase"]);
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    function createStore(states) {
+        if (typeof states !== 'object') {
+            throw new Error('Expected the states to be a object.');
+        }
+        var finalDataManagers = {};
+        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
+        return function getDataManager(key) {
+            if (finalDataManagers.hasOwnProperty(key)) {
+                return finalDataManagers[key];
+            }
+        };
+    }
+    rose.createStore = createStore;
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    var GameEventChannel = (function (_super) {
+        __extends(GameEventChannel, _super);
+        function GameEventChannel() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        GameEventChannel.AFTER_CONFIG = "afterConfig";
+        GameEventChannel.AFTER_MAIN = "afterMain";
+        return GameEventChannel;
+    }(rose.EventEmitter));
+    rose.GameEventChannel = GameEventChannel;
+    __reflect(GameEventChannel.prototype, "rose.GameEventChannel");
+    rose.gameEventChannel = new GameEventChannel();
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    rose.InputEventChannel = new rose.EventEmitter();
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
+     * 启动引导
+     */
+    function boot(gameStage) {
+        return new Promise(function (resolve, reject) {
+            //先设置舞台
+            rose.layerMgr.gameStage = gameStage;
+            //初始化上层容器
+            var infoLayer = new eui.UILayer();
+            infoLayer.touchEnabled = false;
+            rose.layerMgr.initializeInfoLayer(infoLayer);
+            //清理舞台垃圾，，，如游戏需要，可注释
+            // layerMgr.clearBag();
+            //派发配置后事件
+            rose.gameEventChannel.emit(rose.GameEventChannel.AFTER_CONFIG);
+            //结束成功回调
+            resolve();
+        });
+    }
+    rose.boot = boot;
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    rose.TimerEventChannel = new rose.EventEmitter();
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
+     * 数据管理类
+     * @author Created by pony
+     */
+    var DataManager = (function () {
+        function DataManager(values) {
+            this._values = values;
+            this.emitter = new rose.EventEmitter();
+        }
+        ;
+        /**
+         * 设置指定并且通知
+         * @param key
+         * @param value
+         */
+        DataManager.prototype.setValue = function (key, value) {
+            var previousValue = this._values[key];
+            this._values[key] = value;
+            this.emitter.emit(DataManager.CHANGE_DATA_KEY + key, value, previousValue);
+            this.emitter.emit(DataManager.CHANGE_DATA);
+        };
+        ;
+        DataManager.prototype.get = function (key) {
+            var values = this._values;
+            return values[key];
+        };
+        DataManager.prototype.getAll = function () {
+            var results = {};
+            for (var key in this._values) {
+                if (this._values.hasOwnProperty(key)) {
+                    results[key] = this._values[key];
+                }
+            }
+            return results;
+        };
+        ;
+        DataManager.prototype.query = function (search) {
+            var results = {};
+            return results;
+        };
+        DataManager.prototype.each = function (callback, context) {
+        };
+        ;
+        DataManager.prototype.register = function (selector, ctx) {
+            this.emitter.on(DataManager.CHANGE_DATA, selector, ctx);
+        };
+        ;
+        DataManager.prototype.unregister = function (selector, ctx) {
+            this.emitter.off(DataManager.CHANGE_DATA, selector, ctx);
+        };
+        ;
+        DataManager.prototype.registerByKey = function (key, selector, ctx) {
+            this.emitter.on(DataManager.CHANGE_DATA_KEY + key, selector, ctx);
+        };
+        ;
+        DataManager.prototype.unregisterByKey = function (key, selector, ctx) {
+            this.emitter.off(DataManager.CHANGE_DATA_KEY + key, selector, ctx);
+        };
+        ;
+        DataManager.prototype.unregisterAll = function () {
+            this.emitter.removeAllListeners();
+        };
+        ;
+        DataManager.prototype.destroy = function () {
+            this.unregisterAll();
+        };
+        ;
+        DataManager.RESET_DATA = 'reset_data';
+        DataManager.CHANGE_DATA = 'change_data';
+        DataManager.CHANGE_DATA_KEY = 'change_data_';
+        return DataManager;
+    }());
+    rose.DataManager = DataManager;
+    __reflect(DataManager.prototype, "rose.DataManager", ["rose.IDataManager"]);
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /** 打开弹窗特效*/
+    rose.dialogShowEaseBackOut = function (dialog, onEnd) {
+        var dialogWidth = dialog.width;
+        var dialogHeight = dialog.height;
+        dialog.alpha = 0;
+        dialog.scaleX = 0.5;
+        dialog.scaleY = 0.5;
+        dialog.x = dialog.x + dialogWidth / 4;
+        dialog.y = dialog.y + dialogHeight / 4;
+        egret.Tween.get(dialog).to({
+            alpha: 1,
+            scaleX: 1,
+            scaleY: 1,
+            x: dialog.x - dialogWidth / 4,
+            y: dialog.y - dialogHeight / 4
+        }, 300, egret.Ease.backOut).call(onEnd);
+    };
+    /** 默认关闭特效*/
+    rose.dialogCloseDefault = function (dialog, onEnd) {
+        egret.Tween.get(dialog).to({
+            alpha: 0,
+            scaleX: 0,
+            scaleY: 0,
+            x: dialog.x + dialog.width / 2,
+            y: dialog.y + dialog.height / 2
+        }, 300).call(onEnd);
+    };
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
+     * 层级管理
+     * @author Created by peony on 2017/3/02.
+     */
+    var LayerManager = (function () {
+        function LayerManager() {
+        }
+        /** 初始化*/
+        LayerManager.prototype.initializeInfoLayer = function (layer) {
+            this._infoLayer_ = layer;
+            this._infoLayer_.name = '_infoLayer_';
+            this._gameStage.addChild(this._infoLayer_);
+            this._msgLayer = new eui.UILayer();
+            this._msgLayer.touchEnabled = false;
+            this._msgLayer.name = 'msgLayer';
+            this._infoLayer_.addChild(this._msgLayer);
+            this._guideLayer = new eui.UILayer();
+            this._guideLayer.touchEnabled = false;
+            this._guideLayer.name = 'guideLayer';
+            this._infoLayer_.addChild(this._guideLayer);
+            // _topLayer 层禁止触摸交互
+            this._topLayer = new eui.UILayer();
+            this._topLayer.touchEnabled = false;
+            this._topLayer.touchChildren = false;
+            this._topLayer.name = 'topLayer';
+            this._infoLayer_.addChild(this._topLayer);
+        };
+        /** 初始化*/
+        LayerManager.prototype.initializeGameLayer = function (layer) {
+            this._gameLayer_ = layer;
+            this._gameLayer_.name = '_gameLayer_';
+            this._gameStage.addChildAt(this._gameLayer_, 0);
+            this._sceneLayer = new eui.UILayer();
+            this._sceneLayer.touchEnabled = false;
+            this._sceneLayer.name = 'sceneLayer';
+            this._gameLayer_.addChild(this._sceneLayer);
+            this._menuLayer = new eui.UILayer();
+            this._menuLayer.touchEnabled = false;
+            this._menuLayer.name = 'menuLayer';
+            this._gameLayer_.addChild(this._menuLayer);
+            this._dlgLayer = new eui.UILayer();
+            this._dlgLayer.touchEnabled = false;
+            this._dlgLayer.name = 'dlgLayer';
+            this._gameLayer_.addChild(this._dlgLayer);
+        };
+        /**
+         *
+         * 清理舞台上 _gameLayer_ 和 _infoLayer_ 以外的显示对象
+         */
+        LayerManager.prototype.clearBag = function () {
+            if (this._gameStage) {
+                this._gameStage.removeChildren();
+                if (this._gameLayer_) {
+                    this._gameStage.addChild(this._gameLayer_);
+                }
+                if (this._infoLayer_) {
+                    this._gameStage.addChild(this._infoLayer_);
+                }
+            }
+        };
+        Object.defineProperty(LayerManager.prototype, "gameStage", {
+            get: function () {
+                return this._gameStage;
+            },
+            set: function (stage) {
+                this._gameStage = stage;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        Object.defineProperty(LayerManager.prototype, "scene", {
+            get: function () {
+                return this._sceneLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayerManager.prototype, "menu", {
+            get: function () {
+                return this._menuLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayerManager.prototype, "dlg", {
+            get: function () {
+                return this._dlgLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayerManager.prototype, "msg", {
+            get: function () {
+                return this._msgLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayerManager.prototype, "guide", {
+            get: function () {
+                return this._guideLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayerManager.prototype, "top", {
+            get: function () {
+                return this._topLayer;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return LayerManager;
+    }());
+    rose.LayerManager = LayerManager;
+    __reflect(LayerManager.prototype, "rose.LayerManager");
+    rose.layerMgr = new LayerManager();
 })(rose || (rose = {}));
 var net;
 (function (net) {
@@ -1594,6 +1478,27 @@ var MovieClipUtils = (function () {
     return MovieClipUtils;
 }());
 __reflect(MovieClipUtils.prototype, "MovieClipUtils");
+var rose;
+(function (rose) {
+    /** 该 api 只保留了在 h5 端常用方法 */
+    /**
+     * 下一个主循环执行一次。
+     * 这个和nodejs不同的是，多了执行回调的上下文和传参。
+     * @param cb
+     * @param ctx
+     */
+    function nextTick(cb, ctx) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        egret.callLater(function () {
+            cb.apply(ctx, args);
+        }, null);
+    }
+    rose.nextTick = nextTick;
+    ;
+})(rose || (rose = {}));
 var utils;
 (function (utils) {
     var TimedTaskTicker = (function () {
