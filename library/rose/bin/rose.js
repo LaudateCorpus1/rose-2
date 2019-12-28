@@ -81,145 +81,6 @@ var rose;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
-    var EventEmitter = (function () {
-        function EventEmitter() {
-            this._events = Object.create(null);
-            this._eventsCount = 0;
-        }
-        EventEmitter.prototype.eventNames = function () {
-            if (this._eventsCount === 0)
-                return [];
-            var events = this._events;
-            // const names: Array<string> = Object.keys(events);
-            // names.concat(Object.getOwnPropertySymbols(events));
-            return Object.keys(events);
-            // return names;
-        };
-        ;
-        EventEmitter.prototype.listeners = function (event) {
-            var handlers = this._events[event];
-            if (!handlers)
-                return [];
-            var ee = [];
-            for (var i = 0, l = handlers.length; i < l; i++) {
-                ee[i] = handlers[i].fn;
-            }
-            return ee;
-        };
-        ;
-        EventEmitter.prototype.listenerCount = function (event) {
-            var listeners = this._events[event];
-            if (!listeners)
-                return 0;
-            return listeners.length;
-        };
-        ;
-        EventEmitter.prototype.emit = function (event, a1, a2, a3, a4, a5) {
-            var listeners = this._events[event];
-            if (!listeners)
-                return false;
-            var onceList = [];
-            for (var i = 0, length_1 = listeners.length; i < length_1; i++) {
-                var eventBin = listeners[i];
-                if (eventBin.once) {
-                    onceList.push(eventBin);
-                }
-                switch (arguments.length) {
-                    case 1:
-                        eventBin.fn.call(eventBin.context);
-                        break;
-                    case 2:
-                        eventBin.fn.call(eventBin.context, a1);
-                        break;
-                    case 3:
-                        eventBin.fn.call(eventBin.context, a1, a2);
-                        break;
-                    case 4:
-                        eventBin.fn.call(eventBin.context, a1, a2, a3);
-                        break;
-                    case 5:
-                        eventBin.fn.call(eventBin.context, a1, a2, a3, a4);
-                        break;
-                    case 6:
-                        eventBin.fn.call(eventBin.context, a1, a2, a3, a4, a5);
-                        break;
-                    default:
-                        console.error('>>>更多参数请使用数组实现!');
-                }
-            }
-            while (onceList.length) {
-                var onceEventBin = onceList.pop();
-                this.removeListener(event, onceEventBin.fn, onceEventBin.context);
-            }
-            return true;
-        };
-        ;
-        EventEmitter.prototype.removeListener = function (event, fn, context) {
-            var listeners = this._events[event];
-            if (!listeners)
-                return;
-            if (!fn) {
-                this._clearEvent(event);
-                return;
-            }
-            for (var i = 0, len = listeners.length; i < len; i++) {
-                if (listeners[i].fn === fn && listeners[i].context === context) {
-                    listeners.splice(i, 1);
-                    return;
-                }
-            }
-        };
-        ;
-        EventEmitter.prototype.on = function (event, fn, context) {
-            this._addListener(event, fn, context, false);
-        };
-        ;
-        EventEmitter.prototype.once = function (event, fn, context) {
-            this._addListener(event, fn, context, true);
-        };
-        ;
-        EventEmitter.prototype.removeAllListeners = function (event) {
-            if (event) {
-                if (this._events[event]) {
-                    this._clearEvent(event);
-                }
-            }
-            else {
-                this._events = Object.create(null);
-                this._eventsCount = 0;
-            }
-        };
-        ;
-        EventEmitter.prototype.off = function (event, fn, context) {
-            this.removeListener(event, fn, context);
-        };
-        EventEmitter.prototype.addListener = function (event, fn, context) {
-            this.on(event, fn, context);
-        };
-        EventEmitter.prototype._addListener = function (event, fn, context, once) {
-            if (typeof fn !== 'function') {
-                throw new TypeError('The listener must be a function');
-            }
-            var listener = { fn: fn, context: context, once: once }; // 优化时加入对象池功能
-            var list = this._events[event];
-            if (!list) {
-                list = this._events[event] = [];
-                this._eventsCount++;
-            }
-            list.push(listener);
-        };
-        ;
-        EventEmitter.prototype._clearEvent = function (event) {
-            --this._eventsCount;
-            delete this._events[event];
-        };
-        return EventEmitter;
-    }());
-    rose.EventEmitter = EventEmitter;
-    __reflect(EventEmitter.prototype, "rose.EventEmitter");
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
     //创建一个满屏 mask 
     var _createDialogMask = function (isTouch, alpha) {
         if (isTouch === void 0) { isTouch = true; }
@@ -375,7 +236,157 @@ var rose;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
-    rose.NetEventChannel = new rose.EventEmitter();
+    var EventEmitter = (function () {
+        function EventEmitter() {
+            this._events = Object.create(null);
+            this._eventsCount = 0;
+        }
+        EventEmitter.prototype.eventNames = function () {
+            if (this._eventsCount === 0)
+                return [];
+            var events = this._events;
+            // const names: Array<string> = Object.keys(events);
+            // names.concat(Object.getOwnPropertySymbols(events));
+            return Object.keys(events);
+            // return names;
+        };
+        ;
+        EventEmitter.prototype.listeners = function (event) {
+            var handlers = this._events[event];
+            if (!handlers)
+                return [];
+            var ee = [];
+            for (var i = 0, l = handlers.length; i < l; i++) {
+                ee[i] = handlers[i].fn;
+            }
+            return ee;
+        };
+        ;
+        EventEmitter.prototype.listenerCount = function (event) {
+            var listeners = this._events[event];
+            if (!listeners)
+                return 0;
+            return listeners.length;
+        };
+        ;
+        EventEmitter.prototype.emit = function (event, a1, a2, a3, a4, a5) {
+            var listeners = this._events[event];
+            if (!listeners)
+                return false;
+            var onceList = [];
+            for (var i = 0, length_1 = listeners.length; i < length_1; i++) {
+                var eventBin = listeners[i];
+                if (eventBin.once) {
+                    onceList.push(eventBin);
+                }
+                switch (arguments.length) {
+                    case 1:
+                        eventBin.fn.call(eventBin.context);
+                        break;
+                    case 2:
+                        eventBin.fn.call(eventBin.context, a1);
+                        break;
+                    case 3:
+                        eventBin.fn.call(eventBin.context, a1, a2);
+                        break;
+                    case 4:
+                        eventBin.fn.call(eventBin.context, a1, a2, a3);
+                        break;
+                    case 5:
+                        eventBin.fn.call(eventBin.context, a1, a2, a3, a4);
+                        break;
+                    case 6:
+                        eventBin.fn.call(eventBin.context, a1, a2, a3, a4, a5);
+                        break;
+                    default:
+                        console.error('>>>更多参数请使用数组实现!');
+                }
+            }
+            while (onceList.length) {
+                var onceEventBin = onceList.pop();
+                this.removeListener(event, onceEventBin.fn, onceEventBin.context);
+            }
+            return true;
+        };
+        ;
+        EventEmitter.prototype.removeListener = function (event, fn, context) {
+            var listeners = this._events[event];
+            if (!listeners)
+                return;
+            if (!fn) {
+                this._clearEvent(event);
+                return;
+            }
+            for (var i = 0, len = listeners.length; i < len; i++) {
+                if (listeners[i].fn === fn && listeners[i].context === context) {
+                    listeners.splice(i, 1);
+                    return;
+                }
+            }
+        };
+        ;
+        EventEmitter.prototype.on = function (event, fn, context) {
+            this._addListener(event, fn, context, false);
+        };
+        ;
+        EventEmitter.prototype.once = function (event, fn, context) {
+            this._addListener(event, fn, context, true);
+        };
+        ;
+        EventEmitter.prototype.removeAllListeners = function (event) {
+            if (event) {
+                if (this._events[event]) {
+                    this._clearEvent(event);
+                }
+            }
+            else {
+                this._events = Object.create(null);
+                this._eventsCount = 0;
+            }
+        };
+        ;
+        EventEmitter.prototype.off = function (event, fn, context) {
+            this.removeListener(event, fn, context);
+        };
+        EventEmitter.prototype.addListener = function (event, fn, context) {
+            this.on(event, fn, context);
+        };
+        EventEmitter.prototype._addListener = function (event, fn, context, once) {
+            if (typeof fn !== 'function') {
+                throw new TypeError('The listener must be a function');
+            }
+            var listener = { fn: fn, context: context, once: once }; // 优化时加入对象池功能
+            var list = this._events[event];
+            if (!list) {
+                list = this._events[event] = [];
+                this._eventsCount++;
+            }
+            list.push(listener);
+        };
+        ;
+        EventEmitter.prototype._clearEvent = function (event) {
+            --this._eventsCount;
+            delete this._events[event];
+        };
+        return EventEmitter;
+    }());
+    rose.EventEmitter = EventEmitter;
+    __reflect(EventEmitter.prototype, "rose.EventEmitter");
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    var GameEventChannel = (function (_super) {
+        __extends(GameEventChannel, _super);
+        function GameEventChannel() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        GameEventChannel.AFTER_CONFIG = "afterConfig";
+        GameEventChannel.AFTER_MAIN = "afterMain";
+        return GameEventChannel;
+    }(rose.EventEmitter));
+    rose.GameEventChannel = GameEventChannel;
+    __reflect(GameEventChannel.prototype, "rose.GameEventChannel");
+    rose.gameEventChannel = new GameEventChannel();
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -424,7 +435,8 @@ var rose;
         if (jsonData && jsonData.hasOwnProperty(id)) {
             return jsonData[id];
         }
-        return console.error("亲," + fileName + " 文件木有这个ID：" + id), null;
+        console.error(fileName + " 文件没这个ID：" + id);
+        return undefined;
     }
     rose.getJSONWithFileNameAndID = getJSONWithFileNameAndID;
     ;
@@ -786,6 +798,27 @@ var rose;
 var rose;
 (function (rose) {
     /**
+     * 创建 store
+     * @author Created by pony
+     */
+    function createStore(states) {
+        if (typeof states !== 'object') {
+            throw new Error('Expected the states to be a object.');
+        }
+        var finalDataManagers = {};
+        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
+        return function getDataManager(key) {
+            if (finalDataManagers.hasOwnProperty(key)) {
+                return finalDataManagers[key];
+            }
+        };
+    }
+    rose.createStore = createStore;
+})(rose || (rose = {}));
+/// <reference path="../../gui/Dialog.ts" />
+var rose;
+(function (rose) {
+    /**
      *
      * 子模块
      */
@@ -803,65 +836,45 @@ var rose;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
-    function createStore(states) {
-        if (typeof states !== 'object') {
-            throw new Error('Expected the states to be a object.');
+    /**
+     * 服务基类
+     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * @author Created by pony
+     */
+    var Service = (function () {
+        function Service() {
+            this._initProp();
         }
-        var finalDataManagers = {};
-        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
-        return function getDataManager(key) {
-            if (finalDataManagers.hasOwnProperty(key)) {
-                return finalDataManagers[key];
-            }
+        ;
+        Service.prototype._initProp = function () {
         };
-    }
-    rose.createStore = createStore;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    var GameEventChannel = (function (_super) {
-        __extends(GameEventChannel, _super);
-        function GameEventChannel() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        GameEventChannel.AFTER_CONFIG = "afterConfig";
-        GameEventChannel.AFTER_MAIN = "afterMain";
-        return GameEventChannel;
-    }(rose.EventEmitter));
-    rose.GameEventChannel = GameEventChannel;
-    __reflect(GameEventChannel.prototype, "rose.GameEventChannel");
-    rose.gameEventChannel = new GameEventChannel();
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    rose.InputEventChannel = new rose.EventEmitter();
+        return Service;
+    }());
+    rose.Service = Service;
+    __reflect(Service.prototype, "rose.Service");
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
     /**
-     * 启动引导
+     * 服务基类
+     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * @author Created by pony
      */
-    function boot(gameStage) {
-        return new Promise(function (resolve, reject) {
-            //先设置舞台
-            rose.layerMgr.gameStage = gameStage;
-            //初始化上层容器
-            var infoLayer = new eui.UILayer();
-            infoLayer.touchEnabled = false;
-            rose.layerMgr.initializeInfoLayer(infoLayer);
-            //清理舞台垃圾，，，如游戏需要，可注释
-            // layerMgr.clearBag();
-            //派发配置后事件
-            rose.gameEventChannel.emit(rose.GameEventChannel.AFTER_CONFIG);
-            //结束成功回调
-            resolve();
-        });
-    }
-    rose.boot = boot;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    rose.TimerEventChannel = new rose.EventEmitter();
+    var ServiceContainer = (function () {
+        function ServiceContainer() {
+            this._container = Object.create(null);
+        }
+        ServiceContainer.prototype.get = function (key) {
+            return this._container[key];
+        };
+        ServiceContainer.prototype.register = function (key, service) {
+            this._container[key] = service;
+        };
+        return ServiceContainer;
+    }());
+    rose.ServiceContainer = ServiceContainer;
+    __reflect(ServiceContainer.prototype, "rose.ServiceContainer");
+    rose.serviceContainer = new ServiceContainer();
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -939,6 +952,41 @@ var rose;
     }());
     rose.DataManager = DataManager;
     __reflect(DataManager.prototype, "rose.DataManager", ["rose.IDataManager"]);
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
+     * 启动引导
+     */
+    function boot(gameStage) {
+        return new Promise(function (resolve, reject) {
+            //先设置舞台
+            rose.layerMgr.gameStage = gameStage;
+            //初始化上层容器
+            var infoLayer = new eui.UILayer();
+            infoLayer.touchEnabled = false;
+            rose.layerMgr.initializeInfoLayer(infoLayer);
+            //清理舞台垃圾，，，如游戏需要，可注释
+            // layerMgr.clearBag();
+            //派发配置后事件
+            rose.gameEventChannel.emit(rose.GameEventChannel.AFTER_CONFIG);
+            //结束成功回调
+            resolve();
+        });
+    }
+    rose.boot = boot;
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    rose.InputEventChannel = new rose.EventEmitter();
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    rose.NetEventChannel = new rose.EventEmitter();
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    rose.TimerEventChannel = new rose.EventEmitter();
 })(rose || (rose = {}));
 var rose;
 (function (rose) {

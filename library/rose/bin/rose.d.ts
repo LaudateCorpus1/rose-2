@@ -37,24 +37,6 @@ declare namespace rose {
     function registerModuleNotFoundFunc(fn: IModuleNotFoundFunc): void;
 }
 declare namespace rose {
-    class EventEmitter {
-        private _events;
-        private _eventsCount;
-        eventNames(): string[];
-        listeners(event: string): any[];
-        listenerCount(event: string): number;
-        emit(event: string, a1?: any, a2?: any, a3?: any, a4?: any, a5?: any): boolean;
-        removeListener(event: string, fn?: Function, context?: any): void;
-        on(event: string, fn: Function, context?: any): void;
-        once(event: string, fn: Function, context?: any): void;
-        removeAllListeners(event?: string): void;
-        off(event: string, fn?: Function, context?: any): void;
-        addListener(event: string, fn: Function, context?: any): void;
-        private _addListener(event, fn, context, once);
-        private _clearEvent(event);
-    }
-}
-declare namespace rose {
     /**
      * 基于 eui.Component 的 Dialog
      *
@@ -121,7 +103,29 @@ declare namespace rose {
     }
 }
 declare namespace rose {
-    const NetEventChannel: EventEmitter;
+    class EventEmitter {
+        private _events;
+        private _eventsCount;
+        eventNames(): string[];
+        listeners(event: string): any[];
+        listenerCount(event: string): number;
+        emit(event: string, a1?: any, a2?: any, a3?: any, a4?: any, a5?: any): boolean;
+        removeListener(event: string, fn?: Function, context?: any): void;
+        on(event: string, fn: Function, context?: any): void;
+        once(event: string, fn: Function, context?: any): void;
+        removeAllListeners(event?: string): void;
+        off(event: string, fn?: Function, context?: any): void;
+        addListener(event: string, fn: Function, context?: any): void;
+        private _addListener(event, fn, context, once);
+        private _clearEvent(event);
+    }
+}
+declare namespace rose {
+    class GameEventChannel extends EventEmitter {
+        static AFTER_CONFIG: string;
+        static AFTER_MAIN: string;
+    }
+    const gameEventChannel: GameEventChannel;
 }
 declare namespace rose {
     /**
@@ -374,6 +378,16 @@ declare namespace rose {
     const ModuleMgr: ModuleManager;
 }
 declare namespace rose {
+    type DataManagersMap<S> = {
+        [K in keyof S]: IDataManager<S[K]>;
+    };
+    /**
+     * 创建 store
+     * @author Created by pony
+     */
+    function createStore<S>(states: S): <K extends keyof S>(key: K) => IDataManager<S[K]>;
+}
+declare namespace rose {
     /**
      *
      * 子模块
@@ -387,29 +401,29 @@ declare namespace rose {
     }
 }
 declare namespace rose {
-    type DataManagersMap<S> = {
-        [K in keyof S]: IDataManager<S[K]>;
-    };
-    function createStore<S>(states: S): <K extends keyof S>(key: K) => IDataManager<S[K]>;
-}
-declare namespace rose {
-    class GameEventChannel extends EventEmitter {
-        static AFTER_CONFIG: string;
-        static AFTER_MAIN: string;
+    /**
+     * 服务基类
+     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * @author Created by pony
+     */
+    class Service {
+        constructor();
+        protected _initProp(): void;
     }
-    const gameEventChannel: GameEventChannel;
-}
-declare namespace rose {
-    const InputEventChannel: EventEmitter;
 }
 declare namespace rose {
     /**
-     * 启动引导
+     * 服务基类
+     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * @author Created by pony
      */
-    function boot(gameStage: egret.Stage): Promise<void>;
-}
-declare namespace rose {
-    const TimerEventChannel: EventEmitter;
+    class ServiceContainer {
+        private _container;
+        constructor();
+        get(key: string): Service;
+        register(key: string, service: Service): void;
+    }
+    const serviceContainer: ServiceContainer;
 }
 declare namespace rose {
     /**
@@ -440,6 +454,21 @@ declare namespace rose {
         unregisterAll(): void;
         destroy(): void;
     }
+}
+declare namespace rose {
+    /**
+     * 启动引导
+     */
+    function boot(gameStage: egret.Stage): Promise<void>;
+}
+declare namespace rose {
+    const InputEventChannel: EventEmitter;
+}
+declare namespace rose {
+    const NetEventChannel: EventEmitter;
+}
+declare namespace rose {
+    const TimerEventChannel: EventEmitter;
 }
 declare namespace rose {
     interface IDialogEffect {
