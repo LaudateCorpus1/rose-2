@@ -4,6 +4,10 @@ namespace rose {
         [K in keyof S]: IDataManager<S[K]>
     }
 
+    /**
+     * 创建 store
+     * @author Created by pony
+     */
     export function createStore<S>(states: S) {
 
         if (typeof states !== 'object') {

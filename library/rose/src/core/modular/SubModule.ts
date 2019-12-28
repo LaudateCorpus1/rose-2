@@ -1,3 +1,5 @@
+/// <reference path="../../gui/Dialog.ts" />
+
 namespace rose {
 
     /**

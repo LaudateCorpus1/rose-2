@@ -6,7 +6,7 @@ namespace rose {
      */
 
     //============================================================
-    
+
     const staticData = {};
     const configKey: Array<string> = [];
 
@@ -32,6 +32,7 @@ namespace rose {
     export function getJSONWithFileName(fileName: string): any {
         return staticData[fileName];
     };
+    
     /**
      * 获取一个json文件中某个id的单条信息
      * @param fileName
@@ -45,7 +46,9 @@ namespace rose {
             return jsonData[id];
         }
 
-        return console.error("亲," + fileName + " 文件木有这个ID：" + id), null;
+        console.error(fileName + " 文件没这个ID：" + id);
+
+        return undefined;
     };
 
 }
