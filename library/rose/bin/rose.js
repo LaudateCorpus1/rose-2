@@ -392,105 +392,6 @@ var rose;
 (function (rose) {
     /**
      *
-     * 目前简易实现，后续优化
-     */
-    //============================================================
-    var staticData = {};
-    var configKey = [];
-    function addDc(dcModule, dataCfg) { }
-    ;
-    function getData(dcModule, key) { }
-    ;
-    function registerDcParser(type, parser, ctx) { }
-    ;
-    /**
-     * 添加一个json文件的内容
-     * @param fileName
-     * @returns {Object}
-     */
-    function addJSON(fileName, dataCfg) {
-        staticData[fileName] = dataCfg;
-        configKey.push(fileName);
-    }
-    rose.addJSON = addJSON;
-    ;
-    /**
-     * 获取一个json文件的内容
-     * @param fileName
-     * @returns {Object}
-     */
-    function getJSONWithFileName(fileName) {
-        return staticData[fileName];
-    }
-    rose.getJSONWithFileName = getJSONWithFileName;
-    ;
-    /**
-     * 获取一个json文件中某个id的单条信息
-     * @param fileName
-     * @param id
-     * @returns {Object}
-     */
-    function getJSONWithFileNameAndID(fileName, id) {
-        var jsonData = getJSONWithFileName(fileName);
-        if (jsonData && jsonData.hasOwnProperty(id)) {
-            return jsonData[id];
-        }
-        console.error(fileName + " 文件没这个ID：" + id);
-        return undefined;
-    }
-    rose.getJSONWithFileNameAndID = getJSONWithFileNameAndID;
-    ;
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     *
-     * 主模块
-     */
-    var MainModule = (function (_super) {
-        __extends(MainModule, _super);
-        function MainModule() {
-            var _this = _super.call(this) || this;
-            _this.isSubModule = false;
-            _this._initProp();
-            return _this;
-        }
-        ;
-        MainModule.prototype._initProp = function () {
-            this.emitter = new rose.EventEmitter();
-            this.once(egret.Event.ADDED_TO_STAGE, this.onEnterStage, this);
-            this.once(egret.Event.REMOVED_FROM_STAGE, this.onExitStage, this);
-        };
-        MainModule.prototype.init = function () {
-        };
-        ;
-        MainModule.prototype.show = function () {
-            this.touchEnabled = false;
-            rose.layerMgr.initializeGameLayer(this);
-        };
-        ;
-        MainModule.prototype.onEnterStage = function () {
-        };
-        ;
-        MainModule.prototype.close = function () {
-            DisplayUtil.removeFromParent(this);
-        };
-        ;
-        MainModule.prototype.onExitStage = function () {
-        };
-        ;
-        MainModule.prototype.destroy = function () {
-        };
-        ;
-        return MainModule;
-    }(eui.UILayer));
-    rose.MainModule = MainModule;
-    __reflect(MainModule.prototype, "rose.MainModule", ["rose.IModuleBase"]);
-})(rose || (rose = {}));
-var rose;
-(function (rose) {
-    /**
-     *
      * 模块配置项
      * @author Created by pony on 2019/01/01.
      */
@@ -798,22 +699,48 @@ var rose;
 var rose;
 (function (rose) {
     /**
-     * 创建 store
-     * @author Created by pony
+     *
+     * 主模块
      */
-    function createStore(states) {
-        if (typeof states !== 'object') {
-            throw new Error('Expected the states to be a object.');
+    var MainModule = (function (_super) {
+        __extends(MainModule, _super);
+        function MainModule() {
+            var _this = _super.call(this) || this;
+            _this.isSubModule = false;
+            _this._initProp();
+            return _this;
         }
-        var finalDataManagers = {};
-        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
-        return function getDataManager(key) {
-            if (finalDataManagers.hasOwnProperty(key)) {
-                return finalDataManagers[key];
-            }
+        ;
+        MainModule.prototype._initProp = function () {
+            this.emitter = new rose.EventEmitter();
+            this.once(egret.Event.ADDED_TO_STAGE, this.onEnterStage, this);
+            this.once(egret.Event.REMOVED_FROM_STAGE, this.onExitStage, this);
         };
-    }
-    rose.createStore = createStore;
+        MainModule.prototype.init = function () {
+        };
+        ;
+        MainModule.prototype.show = function () {
+            this.touchEnabled = false;
+            rose.layerMgr.initializeGameLayer(this);
+        };
+        ;
+        MainModule.prototype.onEnterStage = function () {
+        };
+        ;
+        MainModule.prototype.close = function () {
+            DisplayUtil.removeFromParent(this);
+        };
+        ;
+        MainModule.prototype.onExitStage = function () {
+        };
+        ;
+        MainModule.prototype.destroy = function () {
+        };
+        ;
+        return MainModule;
+    }(eui.UILayer));
+    rose.MainModule = MainModule;
+    __reflect(MainModule.prototype, "rose.MainModule", ["rose.IModuleBase"]);
 })(rose || (rose = {}));
 /// <reference path="../../gui/Dialog.ts" />
 var rose;
@@ -837,6 +764,22 @@ var rose;
 var rose;
 (function (rose) {
     /**
+     * 创建 createService
+     * @author Created by pony
+     */
+    function createService(service) {
+        function useService(serviceName) {
+            return service[serviceName];
+        }
+        return {
+            useService: useService
+        };
+    }
+    rose.createService = createService;
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
      * 服务基类
      * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
      * @author Created by pony
@@ -856,24 +799,22 @@ var rose;
 var rose;
 (function (rose) {
     /**
-     * 服务基类 -- 简单实现，后期优化
-     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * 创建 store
      * @author Created by pony
      */
-    var ServiceContainer = (function () {
-        function ServiceContainer() {
-            this._container = Object.create(null);
+    function createStore(states) {
+        if (typeof states !== 'object') {
+            throw new Error('Expected the states to be a object.');
         }
-        ServiceContainer.prototype.get = function (key) {
-            return this._container[key];
+        var finalDataManagers = {};
+        Object.keys(states).forEach(function (key) { return finalDataManagers[key] = new rose.DataManager(states[key]); });
+        return function getDataManager(key) {
+            if (finalDataManagers.hasOwnProperty(key)) {
+                return finalDataManagers[key];
+            }
         };
-        ServiceContainer.prototype.register = function (key, service) {
-            this._container[key] = service;
-        };
-        return ServiceContainer;
-    }());
-    rose.ServiceContainer = ServiceContainer;
-    __reflect(ServiceContainer.prototype, "rose.ServiceContainer");
+    }
+    rose.createStore = createStore;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {
@@ -951,6 +892,59 @@ var rose;
     }());
     rose.DataManager = DataManager;
     __reflect(DataManager.prototype, "rose.DataManager", ["rose.IDataManager"]);
+})(rose || (rose = {}));
+var rose;
+(function (rose) {
+    /**
+     *
+     * 目前简易实现，后续优化
+     */
+    //============================================================
+    var staticData = {};
+    var configKey = [];
+    function addDc(dcModule, dataCfg) { }
+    ;
+    function getData(dcModule, key) { }
+    ;
+    function registerDcParser(type, parser, ctx) { }
+    ;
+    /**
+     * 添加一个json文件的内容
+     * @param fileName
+     * @returns {Object}
+     */
+    function addJSON(fileName, dataCfg) {
+        staticData[fileName] = dataCfg;
+        configKey.push(fileName);
+    }
+    rose.addJSON = addJSON;
+    ;
+    /**
+     * 获取一个json文件的内容
+     * @param fileName
+     * @returns {Object}
+     */
+    function getJSONWithFileName(fileName) {
+        return staticData[fileName];
+    }
+    rose.getJSONWithFileName = getJSONWithFileName;
+    ;
+    /**
+     * 获取一个json文件中某个id的单条信息
+     * @param fileName
+     * @param id
+     * @returns {Object}
+     */
+    function getJSONWithFileNameAndID(fileName, id) {
+        var jsonData = getJSONWithFileName(fileName);
+        if (jsonData && jsonData.hasOwnProperty(id)) {
+            return jsonData[id];
+        }
+        console.error(fileName + " 文件没这个ID：" + id);
+        return undefined;
+    }
+    rose.getJSONWithFileNameAndID = getJSONWithFileNameAndID;
+    ;
 })(rose || (rose = {}));
 var rose;
 (function (rose) {

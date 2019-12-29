@@ -129,115 +129,6 @@ declare namespace rose {
 }
 declare namespace rose {
     /**
-     * 数据管理类
-     * @author Created by pony
-     */
-    interface IDataManager<T> {
-        /**
-         * 设置指定并且通知
-         * @param key
-         * @param value
-         */
-        setValue<K extends keyof T>(key: K, value: T[K]): void;
-        get<K extends keyof T>(key: K): T[K];
-        getAll(): T;
-        query(search: any): any;
-        each(callback: any, context: any): any;
-        register(selector: () => void, ctx?: any): void;
-        unregister(selector: () => void, ctx?: any): void;
-        registerByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
-        unregisterByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
-        unregisterAll(): void;
-        destroy(): void;
-    }
-}
-declare namespace rose {
-    /**
-     * 添加一个json文件的内容
-     * @param fileName
-     * @returns {Object}
-     */
-    function addJSON(fileName: string, dataCfg: any): void;
-    /**
-     * 获取一个json文件的内容
-     * @param fileName
-     * @returns {Object}
-     */
-    function getJSONWithFileName(fileName: string): any;
-    /**
-     * 获取一个json文件中某个id的单条信息
-     * @param fileName
-     * @param id
-     * @returns {Object}
-     */
-    function getJSONWithFileNameAndID(fileName: string, id: string): any;
-}
-declare namespace rose {
-    /**
-     *
-     * 主模块
-     */
-    class MainModule extends eui.UILayer implements IModuleBase {
-        id: string;
-        isSubModule: boolean;
-        emitter: EventEmitter;
-        moduleParam: IModuleParam;
-        constructor();
-        protected _initProp(): void;
-        init(): void;
-        show(): void;
-        onEnterStage(): void;
-        close(): void;
-        onExitStage(): void;
-        destroy(): void;
-    }
-}
-declare namespace rose {
-    /**
-     *
-     * 模块接口
-     * @author Created by pony on 2019/01/01.
-     */
-    interface IModuleBase {
-        id: string;
-        isSubModule: boolean;
-        /**
-         * 事件
-         */
-        emitter: EventEmitter;
-        /**
-         * 模块参数
-         */
-        moduleParam: IModuleParam;
-        /**
-         * 初始化
-         */
-        init(): void;
-        /**
-         * 显示
-         */
-        show(): void;
-        /**
-         *
-         * 进入舞台
-         */
-        onEnterStage(): void;
-        /**
-         * 退出舞台
-         */
-        onExitStage(): void;
-        /**
-         * 关闭
-         */
-        close(): void;
-        /**
-         * 析构
-         */
-        destroy(): void;
-    }
-}
-declare namespace rose {
-    /**
      *
      * 模块配置接口
      * @author Created by pony on 2019/01/01.
@@ -378,14 +269,24 @@ declare namespace rose {
     const ModuleMgr: ModuleManager;
 }
 declare namespace rose {
-    type DataManagersMap<S> = {
-        [K in keyof S]: IDataManager<S[K]>;
-    };
     /**
-     * 创建 store
-     * @author Created by pony
+     *
+     * 主模块
      */
-    function createStore<S>(states: S): <K extends keyof S>(key: K) => IDataManager<S[K]>;
+    class MainModule extends eui.UILayer implements IModuleBase {
+        id: string;
+        isSubModule: boolean;
+        emitter: EventEmitter;
+        moduleParam: IModuleParam;
+        constructor();
+        protected _initProp(): void;
+        init(): void;
+        show(): void;
+        onEnterStage(): void;
+        close(): void;
+        onExitStage(): void;
+        destroy(): void;
+    }
 }
 declare namespace rose {
     /**
@@ -402,6 +303,15 @@ declare namespace rose {
 }
 declare namespace rose {
     /**
+     * 创建 createService
+     * @author Created by pony
+     */
+    function createService<S>(service: S): {
+        useService: <K extends keyof S>(serviceName: K) => S[K];
+    };
+}
+declare namespace rose {
+    /**
      * 服务基类
      * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
      * @author Created by pony
@@ -412,21 +322,14 @@ declare namespace rose {
     }
 }
 declare namespace rose {
+    type DataManagersMap<S> = {
+        [K in keyof S]: IDataManager<S[K]>;
+    };
     /**
-     * 服务器容器接口
-     */
-    interface IServiceContainerMap {
-    }
-    /**
-     * 服务基类 -- 简单实现，后期优化
-     * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
+     * 创建 store
      * @author Created by pony
      */
-    class ServiceContainer<S extends IServiceContainerMap> {
-        private _container;
-        get<K extends keyof S>(key: K): S[K];
-        register<K extends keyof S>(key: K, service: S[K]): void;
-    }
+    function createStore<S>(states: S): <K extends keyof S>(key: K) => IDataManager<S[K]>;
 }
 declare namespace rose {
     /**
@@ -455,6 +358,95 @@ declare namespace rose {
         registerByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
         unregisterByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
         unregisterAll(): void;
+        destroy(): void;
+    }
+}
+declare namespace rose {
+    /**
+     * 数据管理类
+     * @author Created by pony
+     */
+    interface IDataManager<T> {
+        /**
+         * 设置指定并且通知
+         * @param key
+         * @param value
+         */
+        setValue<K extends keyof T>(key: K, value: T[K]): void;
+        get<K extends keyof T>(key: K): T[K];
+        getAll(): T;
+        query(search: any): any;
+        each(callback: any, context: any): any;
+        register(selector: () => void, ctx?: any): void;
+        unregister(selector: () => void, ctx?: any): void;
+        registerByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
+        unregisterByKey<K extends keyof T>(key: K, selector: (value?: T[K], previousValue?: T[K]) => void, ctx?: any): void;
+        unregisterAll(): void;
+        destroy(): void;
+    }
+}
+declare namespace rose {
+    /**
+     * 添加一个json文件的内容
+     * @param fileName
+     * @returns {Object}
+     */
+    function addJSON(fileName: string, dataCfg: any): void;
+    /**
+     * 获取一个json文件的内容
+     * @param fileName
+     * @returns {Object}
+     */
+    function getJSONWithFileName(fileName: string): any;
+    /**
+     * 获取一个json文件中某个id的单条信息
+     * @param fileName
+     * @param id
+     * @returns {Object}
+     */
+    function getJSONWithFileNameAndID(fileName: string, id: string): any;
+}
+declare namespace rose {
+    /**
+     *
+     * 模块接口
+     * @author Created by pony on 2019/01/01.
+     */
+    interface IModuleBase {
+        id: string;
+        isSubModule: boolean;
+        /**
+         * 事件
+         */
+        emitter: EventEmitter;
+        /**
+         * 模块参数
+         */
+        moduleParam: IModuleParam;
+        /**
+         * 初始化
+         */
+        init(): void;
+        /**
+         * 显示
+         */
+        show(): void;
+        /**
+         *
+         * 进入舞台
+         */
+        onEnterStage(): void;
+        /**
+         * 退出舞台
+         */
+        onExitStage(): void;
+        /**
+         * 关闭
+         */
+        close(): void;
+        /**
+         * 析构
+         */
         destroy(): void;
     }
 }
