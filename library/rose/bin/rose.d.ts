@@ -413,17 +413,20 @@ declare namespace rose {
 }
 declare namespace rose {
     /**
-     * 服务基类
+     * 服务器容器接口
+     */
+    interface IServiceContainerMap {
+    }
+    /**
+     * 服务基类 -- 简单实现，后期优化
      * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
      * @author Created by pony
      */
-    class ServiceContainer {
+    class ServiceContainer<S extends IServiceContainerMap> {
         private _container;
-        constructor();
-        get(key: string): Service;
-        register(key: string, service: Service): void;
+        get<K extends keyof S>(key: K): S[K];
+        register<K extends keyof S>(key: K, service: S[K]): void;
     }
-    const serviceContainer: ServiceContainer;
 }
 declare namespace rose {
     /**

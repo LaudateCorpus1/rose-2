@@ -856,7 +856,7 @@ var rose;
 var rose;
 (function (rose) {
     /**
-     * 服务基类
+     * 服务基类 -- 简单实现，后期优化
      * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
      * @author Created by pony
      */
@@ -874,7 +874,6 @@ var rose;
     }());
     rose.ServiceContainer = ServiceContainer;
     __reflect(ServiceContainer.prototype, "rose.ServiceContainer");
-    rose.serviceContainer = new ServiceContainer();
 })(rose || (rose = {}));
 var rose;
 (function (rose) {

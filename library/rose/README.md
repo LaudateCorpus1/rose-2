@@ -32,6 +32,7 @@
 
 #### 数据 - store
  * 动态数据：redux 形式管理 store 
+   * 数据不可变 immutable
  * 静态数据：
 
 ------
