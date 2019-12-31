@@ -1,6 +1,6 @@
 namespace rose {
 
-    export type DataManagersMap<S> = {
+    export type DataManagersType<S> = {
         [K in keyof S]: IDataManager<S[K]>
     }
 
@@ -14,16 +14,21 @@ namespace rose {
             throw new Error('Expected the states to be a object.');
         }
 
-        const finalDataManagers: DataManagersMap<S> = {} as DataManagersMap<S>;
+        const finalDataManagers: DataManagersType<S> = {} as DataManagersType<S>;
 
         Object.keys(states).forEach(key => finalDataManagers[key] = new DataManager(states[key]));
 
-        return function getDataManager<K extends keyof S>(key: K): DataManagersMap<S>[K] {
+        function getDataManager<K extends keyof S>(key: K): DataManagersType<S>[K] {
 
-            if (finalDataManagers.hasOwnProperty(key)) {
-                return finalDataManagers[key];
+            if (!finalDataManagers.hasOwnProperty(key)) {
+                throw new Error(`${key} state not provided！！！`);
             }
 
+            return finalDataManagers[key];
+        }
+
+        return {
+            getDataManager
         }
 
     }

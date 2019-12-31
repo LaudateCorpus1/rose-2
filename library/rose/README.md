@@ -1,7 +1,7 @@
 ## 说明文档
 
 ### 概述：
- * 
+ * 初始化流程：store => service => modular
  
 ### 基础核心层 - 模块modular、服务service、数据store
 

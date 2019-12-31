@@ -1,7 +1,10 @@
 {
 	"name": "rose",
 	"scripts": {
-		"build": "egret build"
+		"clear": "rm -rf ./bin",
+		"build": "tsc",
+		"uglifyjs": "uglifyjs ./bin/rose.js -m -o ./bin/rose.min.js",
+		"publish": "npm run clear && npm run build && npm run uglifyjs"
 	},
 	"compilerVersion": "5.2.30"
 }
