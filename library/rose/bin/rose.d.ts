@@ -1,105 +1,131 @@
 declare namespace rose {
-    interface IAudioPathHandler {
-        (audioKey: string): string;
-    }
-    function isAudioEnabled(): boolean;
-    function setAudioEnabled(isAudio: boolean): void;
-    function isBgMusicEnabled(): boolean;
-    function setBgMusicEnabled(isBgMusic: boolean): void;
-    function registerAudioPathHandler(handler: IAudioPathHandler): void;
-    function getAudioPath(audioKey: string): string;
-    /** 播放一个音效 */
-    function playAudio(audioPath: string, loops?: number): Promise<void | egret.SoundChannel>;
-    /** 停止一个音效*/
-    function pauseAudio(audioPath: string): void;
-    /** 播放一个背景音乐*/
-    function playMusic(audioPath: string): void;
-    /**
-     * 暂停背景音乐
-     */
-    function pauseMusic(): void;
-    /**
-     * 恢复背景音乐
-     */
-    function resumeMusic(): void;
-    /**
-     * 设置背景音乐音量
-     * @param volume
-     */
-    function setMusicVolume(volume: number): void;
-    function pushMusic(audioPath: string, loop?: boolean): void;
-    function popMusic(): void;
-    function replaceMusic(audioPath: string, loop?: boolean): void;
-}
-declare namespace rose {
-    /**
-     * 启动引导
-     */
-    function boot(gameStage: egret.Stage): Promise<void>;
-}
-declare namespace rose {
     /**
      *
-     * 主模块
+     * 加载模块样式枚举
+     * @author Created by pony on 2019/01/01.
      */
-    class MainModule extends eui.UILayer implements IModuleBase {
+    enum LoadingModuleTypeEnum {
+        EMPTY = 0,
+        CIRCLE = 1,
+        ARMATURE = 2,
+    }
+    /** 验证模块处理函数*/
+    let _validModuleFunc: IValidModuleFunc;
+    /** 找不到模块处理函数*/
+    let _moduleNotFoundFunc: IModuleNotFoundFunc;
+    /**
+     * 验证模块函数接口
+     */
+    interface IValidModuleFunc {
+        (modCfgItem: IModuleCfgItem, modParam: IModuleParam): boolean;
+    }
+    /**
+     * 找不到模块时候函数接口
+     */
+    interface IModuleNotFoundFunc {
+        (moduleName: string): void;
+    }
+    /**
+     * 登记模块处理函数
+     * @param fn
+     */
+    function registerValidModuleFunc(fn: IValidModuleFunc): void;
+    /**
+     * 登记找不到模块处理函数
+     * @param fn
+     */
+    function registerModuleNotFoundFunc(fn: IModuleNotFoundFunc): void;
+}
+declare namespace rose {
+    /**
+     * 基于 eui.Component 的 Dialog
+     *
+     * 对应的 eui 皮肤命名应为 类名 + "Skin"
+     * @author Created by pony on 2019/01/01.
+     */
+    class Dialog extends eui.Component {
         id: string;
-        isSubModule: boolean;
+        /** 是否铺满*/
+        isFull: boolean;
+        isMask: boolean;
+        isClickMaskClose: boolean;
+        maskLayer: egret.Sprite;
+        /** 是否居中*/
+        isPopupCenter: boolean;
+        /** 皮肤标识符，默认类名字加 Skin*/
+        skinNameIdentify: any;
+        /** 容器标识*/
+        protected _containerName: string;
+        /** 容器*/
+        _container: egret.DisplayObjectContainer;
         emitter: EventEmitter;
-        moduleParam: IModuleParam;
+        isPlayEffect: boolean;
+        /** 打开特效*/
+        popupEffect: IDialogEffect;
+        /** 关闭特效*/
+        closeEffect: IDialogEffect;
+        /** 关闭后执行*/
+        closeHandler: () => void;
         constructor();
         protected _initProp(): void;
         init(): void;
         show(): void;
         onEnterStage(): void;
+        private _showing();
+        private _filledWith();
+        /**
+         * 解析皮肤后、在没有添加到舞台之前
+         */
+        protected _afterAnalysisSkin(): void;
+        /**
+         * 打开完成后，调用此方法（如果有弹出动画，则在动画完成后执行）
+         */
+        protected _onOpened(): void;
+        /**
+         * 添加事件
+         */
+        protected _addEvent(): void;
         close(): void;
         onExitStage(): void;
         destroy(): void;
+        /**
+         * 关闭完成后
+         * 如果有关闭动画，则在动画完成后执行，如有 closeHandler 方法调用 closeHandler 后
+         */
+        protected _onClosed(): void;
+        /**
+         * 移除事件
+         * @private
+         */
+        protected _removeEvent(): void;
+        bringToTop(): void;
+        sendToBack(): void;
     }
 }
 declare namespace rose {
-    /**
-     *
-     * 模块接口
-     * @author Created by pony on 2019/01/01.
-     */
-    interface IModuleBase {
-        id: string;
-        isSubModule: boolean;
-        /**
-         * 事件
-         */
-        emitter: EventEmitter;
-        /**
-         * 模块参数
-         */
-        moduleParam: IModuleParam;
-        /**
-         * 初始化
-         */
-        init(): void;
-        /**
-         * 显示
-         */
-        show(): void;
-        /**
-         *
-         * 进入舞台
-         */
-        onEnterStage(): void;
-        /**
-         * 退出舞台
-         */
-        onExitStage(): void;
-        /**
-         * 关闭
-         */
-        close(): void;
-        /**
-         * 析构
-         */
-        destroy(): void;
+    class EventEmitter {
+        private _events;
+        private _eventsCount;
+        eventNames(): string[];
+        listeners(event: string): any[];
+        listenerCount(event: string): number;
+        emit(event: string, a1?: any, a2?: any, a3?: any, a4?: any, a5?: any): boolean;
+        removeListener(event: string, fn?: Function, context?: any): void;
+        on(event: string, fn: Function, context?: any): void;
+        once(event: string, fn: Function, context?: any): void;
+        removeAllListeners(event?: string): void;
+        off(event: string, fn?: Function, context?: any): void;
+        addListener(event: string, fn: Function, context?: any): void;
+        private _addListener(event, fn, context, once);
+        private _clearEvent(event);
     }
+}
+declare namespace rose {
+    class GameEventChannel extends EventEmitter {
+        static AFTER_CONFIG: string;
+        static AFTER_MAIN: string;
+    }
+    const gameEventChannel: GameEventChannel;
 }
 declare namespace rose {
     /**
@@ -149,42 +175,37 @@ declare namespace rose {
     }
 }
 declare namespace rose {
-    /**
-     *
-     * 加载模块样式枚举
-     * @author Created by pony on 2019/01/01.
-     */
-    enum LoadingModuleTypeEnum {
-        EMPTY = 0,
-        CIRCLE = 1,
-        ARMATURE = 2
+    interface IAudioPathHandler {
+        (audioKey: string): string;
     }
-    /** 验证模块处理函数*/
-    let _validModuleFunc: IValidModuleFunc;
-    /** 找不到模块处理函数*/
-    let _moduleNotFoundFunc: IModuleNotFoundFunc;
+    function isAudioEnabled(): boolean;
+    function setAudioEnabled(isAudio: boolean): void;
+    function isBgMusicEnabled(): boolean;
+    function setBgMusicEnabled(isBgMusic: boolean): void;
+    function registerAudioPathHandler(handler: IAudioPathHandler): void;
+    function getAudioPath(audioKey: string): string;
+    /** 播放一个音效 */
+    function playAudio(audioPath: string, loops?: number): Promise<void | egret.SoundChannel>;
+    /** 停止一个音效*/
+    function pauseAudio(audioPath: string): void;
+    /** 播放一个背景音乐*/
+    function playMusic(audioPath: string): void;
     /**
-     * 验证模块函数接口
+     * 暂停背景音乐
      */
-    interface IValidModuleFunc {
-        (modCfgItem: IModuleCfgItem, modParam: IModuleParam): boolean;
-    }
+    function pauseMusic(): void;
     /**
-     * 找不到模块时候函数接口
+     * 恢复背景音乐
      */
-    interface IModuleNotFoundFunc {
-        (moduleName: string): void;
-    }
+    function resumeMusic(): void;
     /**
-     * 登记模块处理函数
-     * @param fn
+     * 设置背景音乐音量
+     * @param volume
      */
-    function registerValidModuleFunc(fn: IValidModuleFunc): void;
-    /**
-     * 登记找不到模块处理函数
-     * @param fn
-     */
-    function registerModuleNotFoundFunc(fn: IModuleNotFoundFunc): void;
+    function setMusicVolume(volume: number): void;
+    function pushMusic(audioPath: string, loop?: boolean): void;
+    function popMusic(): void;
+    function replaceMusic(audioPath: string, loop?: boolean): void;
 }
 declare namespace rose {
     /**
@@ -227,10 +248,10 @@ declare namespace rose {
         constructor();
         registerLoadingClass(type: LoadingModuleTypeEnum, LoadingLayerClass: any): boolean;
         start<T extends IModuleParam>(id: string, moduleParam?: T): Promise<void>;
-        private _destroyModule;
-        private _onCloseHandle;
-        private _getModuleIndexById;
-        private _getModuleCfgItem;
+        private _destroyModule(mainModule);
+        private _onCloseHandle(moduleId);
+        private _getModuleIndexById(moduleId);
+        private _getModuleCfgItem(id);
         popModule(): void;
         /**
          * 获取所有模块
@@ -249,68 +270,22 @@ declare namespace rose {
 }
 declare namespace rose {
     /**
-     * 基于 eui.Component 的 Dialog
      *
-     * 对应的 eui 皮肤命名应为 类名 + "Skin"
-     * @author Created by pony on 2019/01/01.
+     * 主模块
      */
-    class Dialog extends eui.Component {
+    class MainModule extends eui.UILayer implements IModuleBase {
         id: string;
-        /** 是否铺满*/
-        isFull: boolean;
-        isMask: boolean;
-        isClickMaskClose: boolean;
-        maskLayer: egret.Sprite;
-        /** 是否居中*/
-        isPopupCenter: boolean;
-        /** 皮肤标识符，默认类名字加 Skin*/
-        skinNameIdentify: any;
-        /** 容器标识*/
-        protected _containerName: string;
-        /** 容器*/
-        _container: egret.DisplayObjectContainer;
+        isSubModule: boolean;
         emitter: EventEmitter;
-        isPlayEffect: boolean;
-        /** 打开特效*/
-        popupEffect: IDialogEffect;
-        /** 关闭特效*/
-        closeEffect: IDialogEffect;
-        /** 关闭后执行*/
-        closeHandler: () => void;
+        moduleParam: IModuleParam;
         constructor();
         protected _initProp(): void;
         init(): void;
         show(): void;
         onEnterStage(): void;
-        private _showing;
-        private _filledWith;
-        /**
-         * 解析皮肤后、在没有添加到舞台之前
-         */
-        protected _afterAnalysisSkin(): void;
-        /**
-         * 打开完成后，调用此方法（如果有弹出动画，则在动画完成后执行）
-         */
-        protected _onOpened(): void;
-        /**
-         * 添加事件
-         */
-        protected _addEvent(): void;
         close(): void;
         onExitStage(): void;
         destroy(): void;
-        /**
-         * 关闭完成后
-         * 如果有关闭动画，则在动画完成后执行，如有 closeHandler 方法调用 closeHandler 后
-         */
-        protected _onClosed(): void;
-        /**
-         * 移除事件
-         * @private
-         */
-        protected _removeEvent(): void;
-        bringToTop(): void;
-        sendToBack(): void;
     }
 }
 declare namespace rose {
@@ -327,6 +302,19 @@ declare namespace rose {
     }
 }
 declare namespace rose {
+    type ServiceConfigType = {
+        [index: string]: new () => Service;
+    };
+    /**
+     * 创建 createService
+     * @author Created by pony
+     */
+    function createService<S extends ServiceConfigType>(service: S): {
+        initialize: () => void;
+        use: <K extends keyof S>(serviceName: K) => any;
+    };
+}
+declare namespace rose {
     /**
      * 服务基类
      * 在复杂业务场景下用于做业务逻辑封装的一个抽象层
@@ -338,16 +326,15 @@ declare namespace rose {
     }
 }
 declare namespace rose {
-    type ServiceConfigType = {
-        [index: string]: new () => Service;
+    type DataManagersType<S> = {
+        [K in keyof S]: IDataManager<S[K]>;
     };
     /**
-     * 创建 createService
+     * 创建 store
      * @author Created by pony
      */
-    function createService<S extends ServiceConfigType>(service: S): {
-        initialize: () => void;
-        use: <K extends keyof S>(serviceName: K) => InstanceType<S[K]>;
+    function createStore<S>(states: S): {
+        getDataManager: <K extends keyof S>(key: K) => IDataManager<S[K]>;
     };
 }
 declare namespace rose {
@@ -356,9 +343,9 @@ declare namespace rose {
      * @author Created by pony
      */
     class DataManager<T> implements IDataManager<T> {
-        static readonly RESET_DATA = "reset_data";
-        static readonly CHANGE_DATA = "change_data";
-        static readonly CHANGE_DATA_KEY = "change_data_";
+        static readonly RESET_DATA: string;
+        static readonly CHANGE_DATA: string;
+        static readonly CHANGE_DATA_KEY: string;
         private readonly _values;
         protected readonly emitter: EventEmitter;
         constructor(values: T);
@@ -426,41 +413,54 @@ declare namespace rose {
     function getJSONWithFileNameAndID(fileName: string, id: string): any;
 }
 declare namespace rose {
-    type DataManagersType<S> = {
-        [K in keyof S]: IDataManager<S[K]>;
-    };
     /**
-     * 创建 store
-     * @author Created by pony
+     *
+     * 模块接口
+     * @author Created by pony on 2019/01/01.
      */
-    function createStore<S>(states: S): {
-        getDataManager: <K extends keyof S>(key: K) => DataManagersType<S>[K];
-    };
-}
-declare namespace rose {
-    class EventEmitter {
-        private _events;
-        private _eventsCount;
-        eventNames(): string[];
-        listeners(event: string): any[];
-        listenerCount(event: string): number;
-        emit(event: string, a1?: any, a2?: any, a3?: any, a4?: any, a5?: any): boolean;
-        removeListener(event: string, fn?: Function, context?: any): void;
-        on(event: string, fn: Function, context?: any): void;
-        once(event: string, fn: Function, context?: any): void;
-        removeAllListeners(event?: string): void;
-        off(event: string, fn?: Function, context?: any): void;
-        addListener(event: string, fn: Function, context?: any): void;
-        private _addListener;
-        private _clearEvent;
+    interface IModuleBase {
+        id: string;
+        isSubModule: boolean;
+        /**
+         * 事件
+         */
+        emitter: EventEmitter;
+        /**
+         * 模块参数
+         */
+        moduleParam: IModuleParam;
+        /**
+         * 初始化
+         */
+        init(): void;
+        /**
+         * 显示
+         */
+        show(): void;
+        /**
+         *
+         * 进入舞台
+         */
+        onEnterStage(): void;
+        /**
+         * 退出舞台
+         */
+        onExitStage(): void;
+        /**
+         * 关闭
+         */
+        close(): void;
+        /**
+         * 析构
+         */
+        destroy(): void;
     }
 }
 declare namespace rose {
-    class GameEventChannel extends EventEmitter {
-        static AFTER_CONFIG: string;
-        static AFTER_MAIN: string;
-    }
-    const gameEventChannel: GameEventChannel;
+    /**
+     * 启动引导
+     */
+    function boot(gameStage: egret.Stage): Promise<void>;
 }
 declare namespace rose {
     const InputEventChannel: EventEmitter;
@@ -576,7 +576,7 @@ declare namespace net {
          * @param ctx
          */
         post4Json(route: string, args: IHttpRequestInfoArgs, cb: IHttpRequestInfoCallFunc, ctx: any): void;
-        private _requestPost4Json;
+        private _requestPost4Json(requestInfo);
         protected _getRequestInfo(route: string, args: IHttpRequestInfoArgs, cb: IHttpRequestInfoCallFunc, ctx: any): IHttpRequestInfo;
         /**
          * 处理请求结果
@@ -638,6 +638,15 @@ declare namespace DisplayUtil {
     /**  -- 废弃 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。*/
     function createBitmapByName(name: string): egret.Bitmap;
 }
+declare namespace logger {
+    let log: (...args) => void;
+    let debug: (...args) => void;
+    let info: (...args) => void;
+    let warn: (...args) => void;
+    let error: (...args) => void;
+    /** 设置日志等级*/
+    function setLvl(lvl: number): void;
+}
 declare namespace MathsUtil {
     /** 获取百分比*/
     function numPercentage(curProgress: number, totalProgress: number, ratio: number): number;
@@ -673,6 +682,16 @@ declare class MovieClipUtils {
     */
     static createMovieClip(resPath: string, actName: string, comFunc: (mc: egret.MovieClip) => void, ctx: any): void;
 }
+declare namespace rose {
+    /** 该 api 只保留了在 h5 端常用方法 */
+    /**
+     * 下一个主循环执行一次。
+     * 这个和nodejs不同的是，多了执行回调的上下文和传参。
+     * @param cb
+     * @param ctx
+     */
+    function nextTick(cb: (...args) => void, ctx?: any, ...args: any[]): void;
+}
 declare namespace utils {
     class TimedTaskTicker {
         constructor();
@@ -699,12 +718,12 @@ declare namespace utils {
         /**
          * @private
          */
-        private getTickIndex;
+        private getTickIndex(callBack, thisObject);
         /**
          * @private
          *
          */
-        private concatTick;
+        private concatTick();
         /**
          * 暂停心跳
          */
@@ -728,23 +747,4 @@ declare namespace utils {
      * 启动心跳计时器。
      */
     function startTimedTaskTicker(ticker: TimedTaskTicker): void;
-}
-declare namespace logger {
-    let log: (...args: any[]) => void;
-    let debug: (...args: any[]) => void;
-    let info: (...args: any[]) => void;
-    let warn: (...args: any[]) => void;
-    let error: (...args: any[]) => void;
-    /** 设置日志等级*/
-    function setLvl(lvl: number): void;
-}
-declare namespace rose {
-    /** 该 api 只保留了在 h5 端常用方法 */
-    /**
-     * 下一个主循环执行一次。
-     * 这个和nodejs不同的是，多了执行回调的上下文和传参。
-     * @param cb
-     * @param ctx
-     */
-    function nextTick(cb: (...args: any[]) => void, ctx?: any, ...args: any[]): void;
 }

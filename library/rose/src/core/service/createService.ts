@@ -20,7 +20,8 @@ namespace rose {
 
         const serviceContainer = {} as any;
 
-        function use<K extends keyof S>(serviceName: K): InstanceType<S[K]> {
+        // function use<K extends keyof S>(serviceName: K): InstanceType<S[K]> {
+        function use<K extends keyof S>(serviceName: K): any {
 
             if (!serviceContainer.hasOwnProperty(serviceName)) {
                 throw new Error(`${serviceName} service not provided！！！`);
